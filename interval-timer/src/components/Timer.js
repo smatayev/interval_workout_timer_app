@@ -10,6 +10,7 @@ const Timer = () => {
     const [isResting, setIsResting] = useState(false);
     const [countdown, setCountdown] = useState(3);
     const [savedSettings, setSavedSettings] = useState([]);
+    const [isPaused, setIsPaused] = useState(false);
 
     // Load last 3 settings from local storage on initial render
     useEffect(() => {
@@ -41,7 +42,7 @@ const Timer = () => {
     // Manage interval/rest countdowns
     useEffect(() => {
         let timer;
-        if (isRunning && countdown === 0) {
+        if (isRunning && countdown === 0 && !isPaused) {
             timer = setInterval(() => {
                 setTimeLeft((prevTime) => {
                     if (prevTime > 0) return prevTime - 1;
@@ -63,7 +64,7 @@ const Timer = () => {
             }, 1000);
         }
         return () => clearInterval(timer);
-    }, [isRunning, countdown, isResting, timeLeft, currentInterval, totalIntervals]);
+    }, [isRunning, countdown, isResting, timeLeft, currentInterval, totalIntervals, isPaused]);
 
     const startTimer = () => {
         setCountdown(3);
@@ -71,16 +72,44 @@ const Timer = () => {
         setIsResting(false);
         setTimeLeft(intervalLength.minutes * 60 + intervalLength.seconds);
         setIsRunning(true);
+        setIsPaused(false);
     };
 
     const stopTimer = () => {
         setIsRunning(false);
         setCountdown(3);
         setTimeLeft(0);
+        setIsPaused(false); // Reset pause state when stopped
+    };
+
+    const pauseTimer = () => {
+        setIsPaused(true);
+    };
+
+    const continueTimer = () => {
+        setIsPaused(false);
+    };
+
+    const loadSavedSetting = (setting) => {
+        setIntervalLength(setting.intervalLength);
+        setRestLength(setting.restLength);
+        setTotalIntervals(setting.totalIntervals);
     };
 
     return (
         <div>
+            {isRunning && countdown > 0 && (
+                <div className="overlay">
+                    <div>{countdown}</div>
+                    <div className="overlay-buttons">
+                        <button onClick={isPaused ? continueTimer : startTimer}>
+                            {isPaused ? "Continue" : "Start"}
+                        </button>
+                        <button onClick={pauseTimer} disabled={!isRunning || isPaused}>Pause</button>
+                        <button onClick={stopTimer}>Stop</button>
+                    </div>
+                </div>
+            )}
             <h1>Interval Timer</h1>
             <div>
                 <label>Interval Length:</label>
@@ -131,7 +160,8 @@ const Timer = () => {
                 <h2>{countdown > 0 ? `Starting in: ${countdown}` : `Time Left: ${Math.floor(timeLeft / 60)}:${timeLeft % 60 < 10 ? '0' : ''}${timeLeft % 60}`}</h2>
                 <h3>{isResting ? "Resting" : `Interval ${currentInterval} of ${totalIntervals}`}</h3>
             </div>
-            <button onClick={startTimer} disabled={isRunning}>Start</button>
+            <button onClick={isPaused ? continueTimer : startTimer} disabled={isRunning && !isPaused}>{isPaused ? "Continue" : "Start"}</button>
+            <button onClick={pauseTimer} disabled={!isRunning || isPaused}>Pause</button>
             <button onClick={stopTimer}>Stop</button>
             <div>
                 <h3>Last 3 Settings:</h3>
@@ -139,6 +169,7 @@ const Timer = () => {
                     {savedSettings.map((setting, index) => (
                         <li key={index}>
                             Interval: {setting.intervalLength.minutes}m {setting.intervalLength.seconds}s, Rest: {setting.restLength.minutes}m {setting.restLength.seconds}s, Intervals: {setting.totalIntervals}
+                            <button onClick={() => loadSavedSetting(setting)}>Load</button>
                         </li>
                     ))}
                 </ul>
