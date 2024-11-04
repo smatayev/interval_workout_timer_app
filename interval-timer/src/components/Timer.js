@@ -98,9 +98,15 @@ const Timer = () => {
 
     return (
         <div>
-            {isRunning && countdown > 0 && (
+            {(isRunning && (countdown > 0 || timeLeft > 0)) && (
                 <div className="overlay">
-                    <div>{countdown}</div>
+                    <div>
+                        {countdown > 0 
+                            ? countdown 
+                            : `${Math.floor(timeLeft / 60)}:${timeLeft % 60 < 10 ? '0' : ''}${timeLeft % 60}`
+                        }
+                    </div>
+                    <div>{isResting ? "Rest Period" : `Interval ${currentInterval} of ${totalIntervals}`}</div>
                     <div className="overlay-buttons">
                         <button onClick={isPaused ? continueTimer : startTimer}>
                             {isPaused ? "Continue" : "Start"}
