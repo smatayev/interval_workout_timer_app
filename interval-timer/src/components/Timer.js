@@ -47,16 +47,23 @@ const Timer = () => {
                 setTimeLeft((prevTime) => {
                     if (prevTime > 0) return prevTime - 1;
 
-                    clearInterval(timer);
-                    if (!isResting && currentInterval < totalIntervals) {
-                        setIsResting(true);
-                        setTimeLeft(restLength.minutes * 60 + restLength.seconds);
-                    } else if (isResting) {
-                        setCurrentInterval((prev) => prev + 1);
-                        setIsResting(false);
-                        setTimeLeft(intervalLength.minutes * 60 + intervalLength.seconds);
+                    // If timeLeft reaches 0, check if we're in a rest  or interval period
+                    if (isResting) {
+                        
+                        // If it's the last interval and rest, stop the timer
+                        if (currentInterval >= totalIntervals) {
+                            clearInterval(timer);
+                            setIsRunning(false);
+                        } else {
+                            // Otherwise, move to the next interval
+                            setIsResting(false); // switch back to an interval
+                            setCurrentInterval((prev) => Math.min(prev + 1, totalIntervals));
+                            setTimeLeft(restLength.minutes * 60 + restLength.seconds); // set timeLeft to interval length
+                        }
                     } else {
-                        setIsRunning(false);
+                        // switch to rest period
+                        setIsResting(true); // swithc to rest
+                        setTimeLeft(restLength.minutes * 60 + restLength.seconds); // set timeLength to rest length
                     }
 
                     return prevTime;
@@ -64,7 +71,7 @@ const Timer = () => {
             }, 1000);
         }
         return () => clearInterval(timer);
-    }, [isRunning, countdown, isResting, timeLeft, currentInterval, totalIntervals, isPaused]);
+    }, [isRunning, countdown, isPaused, isResting, currentInterval, totalIntervals, intervalLength, restLength]);
 
     const startTimer = () => {
         setCountdown(3);
@@ -98,14 +105,16 @@ const Timer = () => {
 
     return (
         <div>
-            {(isRunning && (countdown > 0 || timeLeft > 0)) && (
+            {isRunning && (
                 <div className="overlay">
                     <div>
+                        {/* Show countdown if still counting down; otherwise, show timeLeft */}
                         {countdown > 0 
                             ? countdown 
                             : `${Math.floor(timeLeft / 60)}:${timeLeft % 60 < 10 ? '0' : ''}${timeLeft % 60}`
                         }
                     </div>
+                    {/* Display Rest or Interval info based on isResting */}
                     <div>{isResting ? "Rest Period" : `Interval ${currentInterval} of ${totalIntervals}`}</div>
                     <div className="overlay-buttons">
                         <button onClick={isPaused ? continueTimer : startTimer}>

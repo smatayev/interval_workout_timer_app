@@ -15,7 +15,7 @@ The app also saves the last three interval settings for quick reuse.
 - Persistent storage of last three used settings
 
 ## How to Run
-
+- *Launching an app soon*
 
 ## Technologies Used
 - React
