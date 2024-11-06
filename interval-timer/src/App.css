@@ -1,132 +1,81 @@
-/* Center everything in the viewport */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* src/App.css */
+.app-container {
+  text-align: center;
+  padding: 20px;
   font-family: Arial, sans-serif;
 }
 
-body, html, #root, .App {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f3f4f6; /* Light gray background for a clean look */
-}
-
-.App {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  width: 90%;
+.settings-container,
+.timer-container,
+.controls-container {
+  margin: 20px auto;
   max-width: 400px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-h2, h3 {
-  color: #555;
-  margin: 1rem 0;
-}
-
-label {
-  font-weight: bold;
-  color: #333;
-}
-
-input[type="number"] {
-  width: 50px;
-  padding: 5px;
-  margin: 0 5px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  text-align: center;
-  font-size: 1rem;
-}
-
-button {
-  margin-top: 1rem;
-  padding: 10px 20px;
-  font-size: 1rem;
-  color: #fff;
-  background-color: #4CAF50;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:disabled {
-  background-color: #aaa;
-}
-
-button:hover:not(:disabled) {
-  background-color: #45a049;
-}
-
-.last-settings {
-  margin-top: 1.5rem;
-  width: 100%;
   text-align: left;
 }
 
-.last-settings ul {
-  list-style: none;
-  padding: 0;
+label {
+  margin-right: 10px;
 }
 
-.last-settings li {
-  padding: 5px 0;
-  color: #777;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8); /* semi-transparent background */
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-  z-index: 1000;
+input {
+  margin: 5px;
+  padding: 5px;
+  width: 50px;
   text-align: center;
 }
 
-.overlay-buttons {
-  margin-top: 2rem;
-  display: flex;
-  gap: 1rem;
-}
-
-.overlay-buttons button {
-  padding: 0.5rem 1rem;
-  font-size: 1.5rem;
-  color: #fff;
-  background-color: #4CAF50;
-  border: none;
-  border-radius: 5px;
+.control-button {
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  transition: background-color 0.3s;
 }
 
-.overlay-buttons button:disabled {
-  background-color: #aaa;
+.control-button:hover {
+  background-color: #0056b3;
 }
 
-.overlay-buttons button:hover:not(:disabled) {
-  background-color: #45a049;
+.stop-button {
+  background-color: #dc3545;
+}
+
+.stop-button:hover {
+  background-color: #c82333;
+}
+
+.timer-container {
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid #007bff;
+  margin-bottom: 20px;
+}
+
+.timer-container.resting {
+  border-color: #17a2b8;
+}
+
+.circular-progress-bar {
+  margin: 20px auto;
+  max-width: 150px;
+}
+
+/* Countdown overlay */
+.countdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 48px;
+  z-index: 10;
 }
