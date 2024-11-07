@@ -16,16 +16,19 @@ function App() {
   const [isResting, setIsResting] = useState(false);
   const [countdown, setCountdown] = useState(3);
 
-  // Update timeLeft when duration settings change and the timer is not running
+  // Update timeLeft whenever the intervalDuration changes and the timer is not running
   useEffect(() => {
     if (!isRunning) {
-      if (isResting) {
-        setTimeLeft(restDuration.minutes * 60 + restDuration.seconds);
-      } else {
-        setTimeLeft(intervalDuration.minutes * 60 + intervalDuration.seconds);
-      }
+      setTimeLeft(intervalDuration.minutes * 60 + intervalDuration.seconds);
     }
-  }, [intervalDuration, restDuration, isRunning, isResting]);
+  }, [intervalDuration, isRunning]);
+
+  // Update timeLeft whenever the restDuration changes and the timer is not running and in a rest state
+  useEffect(() => {
+    if (!isRunning && isResting) {
+      setTimeLeft(restDuration.minutes * 60 + restDuration.seconds);
+    }
+  }, [restDuration, isRunning, isResting]);
 
   const handleIntervalComplete = useCallback(() => {
     if (!isResting) {
@@ -77,36 +80,44 @@ function App() {
         </div>
       ) : (
         <>
-          <Settings
-            intervalDuration={intervalDuration}
-            setIntervalDuration={setIntervalDuration}
-            restDuration={restDuration}
-            setRestDuration={setRestDuration}
-            totalIntervals={totalIntervals}
-            setTotalIntervals={setTotalIntervals}
-          />
-          <Timer
-            timeLeft={timeLeft}
-            isResting={isResting}
-            currentInterval={currentInterval}
-            totalIntervals={totalIntervals}
-          />
-          <ProgressBar
-            totalIntervals={totalIntervals}
-            currentInterval={currentInterval}
-            isResting={isResting}
-            intervalDuration={intervalDuration}
-            restDuration={restDuration}
-          />
-          <Controls
-            isRunning={isRunning}
-            setIsRunning={setIsRunning}
-            setTimeLeft={setTimeLeft}
-            intervalDuration={intervalDuration}
-            restDuration={restDuration}
-            setCurrentInterval={setCurrentInterval}
-            setIsResting={setIsResting}
-          />
+          <div className="settings-container">
+            <Settings
+              intervalDuration={intervalDuration}
+              setIntervalDuration={setIntervalDuration}
+              restDuration={restDuration}
+              setRestDuration={setRestDuration}
+              totalIntervals={totalIntervals}
+              setTotalIntervals={setTotalIntervals}
+            />
+          </div>
+          <div className="timer-container">
+            <Timer
+              timeLeft={timeLeft}
+              isResting={isResting}
+              currentInterval={currentInterval}
+              totalIntervals={totalIntervals}
+            />
+          </div>
+          <div className="progress-bar-container">
+            <ProgressBar
+              totalIntervals={totalIntervals}
+              currentInterval={currentInterval}
+              isResting={isResting}
+              intervalDuration={intervalDuration}
+              restDuration={restDuration}
+            />
+          </div>
+          <div className="controls-container">
+            <Controls
+              isRunning={isRunning}
+              setIsRunning={setIsRunning}
+              setTimeLeft={setTimeLeft}
+              intervalDuration={intervalDuration}
+              restDuration={restDuration}
+              setCurrentInterval={setCurrentInterval}
+              setIsResting={setIsResting}
+            />
+          </div>
         </>
       )}
     </div>
