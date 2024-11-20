@@ -11,14 +11,16 @@ function ProgressBar({ totalIntervals, currentInterval, isResting, intervalDurat
   const percentage = (completedTime / totalSessionTime) * 100;
 
   return (
-    <div style={{ width: 150, height: 150, margin: 'auto' }}>
+    <div style={{ width: 100, height: 100, margin: 'auto' }}>
       <CircularProgressbar
         value={percentage}
         text={`${Math.round(percentage)}%`}
         styles={buildStyles({
           pathColor: isResting ? 'azure' : 'cerulean',
           trailColor: 'navy',
+          textSize: '15px',
         })}
+        style={{ transform: 'scale(0.5)' }} // Adjust scale factor to resize
       />
     </div>
   );

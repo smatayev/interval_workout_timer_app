@@ -97,16 +97,17 @@ function App() {
               currentInterval={currentInterval}
               totalIntervals={totalIntervals}
             />
+            <div style={{ width: '100px', height: '100px' }}>
+              <ProgressBar
+                totalIntervals={totalIntervals}
+                currentInterval={currentInterval}
+                isResting={isResting}
+                intervalDuration={intervalDuration}
+                restDuration={restDuration}
+              />
+            </div>
           </div>
-          <div className="progress-bar-container">
-            <ProgressBar
-              totalIntervals={totalIntervals}
-              currentInterval={currentInterval}
-              isResting={isResting}
-              intervalDuration={intervalDuration}
-              restDuration={restDuration}
-            />
-          </div>
+
           <div className="controls-container">
             <Controls
               isRunning={isRunning}
