@@ -1,9 +1,10 @@
-// src/components/Controls.js
 import React from 'react';
 
 function Controls({
   isRunning,
+  isPaused,
   setIsRunning,
+  setIsPaused,
   setTimeLeft,
   intervalDuration,
   restDuration,
@@ -11,11 +12,17 @@ function Controls({
   setIsResting,
 }) {
   const handleStartPause = () => {
-    setIsRunning((prev) => !prev);
+    if (isRunning) {
+      setIsPaused((prev) => !prev); // Toggle pause state
+    } else {
+      setIsRunning(true); // Start the timer
+      setIsPaused(false); // Ensure pause state is reset when starting
+    }
   };
 
   const handleStop = () => {
     setIsRunning(false);
+    setIsPaused(false); // Reset pause state
     setTimeLeft(intervalDuration.minutes * 60 + intervalDuration.seconds);
     setCurrentInterval(1);
     setIsResting(false);
@@ -24,7 +31,7 @@ function Controls({
   return (
     <div className="controls-container">
       <button onClick={handleStartPause} className="control-button">
-        {isRunning ? 'Pause' : 'Start'}
+        {isRunning ? (isPaused ? 'Continue' : 'Pause') : 'Start'}
       </button>
       <button onClick={handleStop} className="control-button stop-button">
         Stop

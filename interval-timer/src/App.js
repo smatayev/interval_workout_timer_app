@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useEffect, useCallback } from 'react';
 import Settings from './components/Settings';
 import Timer from './components/Timer';
@@ -12,18 +11,17 @@ function App() {
   const [totalIntervals, setTotalIntervals] = useState(3);
   const [currentInterval, setCurrentInterval] = useState(1);
   const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false); // NEW: To track if the timer is paused
   const [timeLeft, setTimeLeft] = useState(intervalDuration.minutes * 60 + intervalDuration.seconds);
   const [isResting, setIsResting] = useState(false);
   const [countdown, setCountdown] = useState(3);
 
-  // Update timeLeft whenever the intervalDuration changes and the timer is not running
   useEffect(() => {
     if (!isRunning) {
       setTimeLeft(intervalDuration.minutes * 60 + intervalDuration.seconds);
     }
   }, [intervalDuration, isRunning]);
 
-  // Update timeLeft whenever the restDuration changes and the timer is not running and in a rest state
   useEffect(() => {
     if (!isRunning && isResting) {
       setTimeLeft(restDuration.minutes * 60 + restDuration.seconds);
@@ -37,8 +35,8 @@ function App() {
     } else {
       setCurrentInterval((prev) => prev + 1);
       if (currentInterval >= totalIntervals) {
-        // End of session
         setIsRunning(false);
+        setIsPaused(false);
         setCountdown(3);
         setCurrentInterval(1);
         setIsResting(false);
@@ -51,7 +49,7 @@ function App() {
   }, [isResting, restDuration, currentInterval, totalIntervals, intervalDuration]);
 
   useEffect(() => {
-    if (isRunning) {
+    if (isRunning && !isPaused) {
       if (countdown > 0) {
         const countdownTimer = setTimeout(() => setCountdown((prev) => prev - 1), 1000);
         return () => clearTimeout(countdownTimer);
@@ -69,7 +67,7 @@ function App() {
         return () => clearInterval(timer);
       }
     }
-  }, [isRunning, countdown, handleIntervalComplete]);
+  }, [isRunning, isPaused, countdown, handleIntervalComplete]);
 
   return (
     <div className="app-container">
@@ -111,7 +109,9 @@ function App() {
           <div className="controls-container">
             <Controls
               isRunning={isRunning}
+              isPaused={isPaused} // Pass new state
               setIsRunning={setIsRunning}
+              setIsPaused={setIsPaused} // Pass new setter
               setTimeLeft={setTimeLeft}
               intervalDuration={intervalDuration}
               restDuration={restDuration}
