@@ -1,6 +1,5 @@
 name: CI Pipeline
 
-# Trigger the workflow on pushes and pull requests to the main branch
 on:
   push:
     branches:
@@ -14,23 +13,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Check out the repository code
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Step 1: Check out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          node-version: '20' # Explicitly specify Node.js version for the action
 
-    # Step 2: Set up Node.js
-    - name: Install dependencies
-      run: npm ci
+      # Step 2: Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-    # Step 3: Install dependencies
-    - name: Install dependencies
-      run: npm ci
-      
-    # Step 4: Run tests
-    #- name: Run tests
-    #  run: npm test
-      
-    # Step 5: Lint the code
-    #- name: Lint code
-    #  run: npm run lint
-    
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Run tests
+      - name: Run tests
+        run: npm test
+
+      # Step 5: Lint the code
+      - name: Lint code
+        run: npm run lint
