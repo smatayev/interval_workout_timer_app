@@ -13,9 +13,10 @@ The app also saves the last three interval settings for quick reuse.
 - Adjustable number of intervals
 - Countdown before starting
 - Persistent storage of last three used settings
+- Pause/Continue/Stop the timer
 
 ## How to Run
-- *Launching an app soon*
+- *Launching soon*
 
 ## Technologies Used
 - React
