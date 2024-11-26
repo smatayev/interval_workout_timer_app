@@ -27,7 +27,7 @@ jobs:
           port: ${{ secrets.PORT }}
           source: interval-timer-app.tar
           target: ~/interval-timer-app.tar
-          debug: true
+          # debug: true
       
       - name: Deploy Docker container on Azure VM
         uses: appleboy/ssh-action@v0.1.7
