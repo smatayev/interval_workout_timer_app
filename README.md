@@ -20,8 +20,8 @@ The app also saves the last three interval settings for quick reuse.
 
 ## Technologies Used
 - React
-- Local Storage for settings persistence
 - Docker container
 - Azure VM
 - ESLint
 - Jest
+- GitHub Actions
