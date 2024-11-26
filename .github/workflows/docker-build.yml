@@ -30,7 +30,7 @@ jobs:
           debug: true
       
       - name: Deploy Docker container on Azure VM
-        uses: appleboy/ssh-action@v1.1.0
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.AZURE_VM_IP }}
           username: ${{ secrets.AZURE_VM_USER }}
