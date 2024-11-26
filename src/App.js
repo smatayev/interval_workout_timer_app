@@ -71,7 +71,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>Interval Timer</h1>
+      <h1>Interval Timer App</h1>
       {isRunning && countdown > 0 ? (
         <div className="countdown-overlay">
           <h2>Starting in {countdown}...</h2>
