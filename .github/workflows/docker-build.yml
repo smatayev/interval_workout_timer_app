@@ -27,6 +27,7 @@ jobs:
           port: 22
           source: interval-timer-app.tar
           target: ~/interval-timer-app.tar
+          debug: true
       
       - name: Deploy Docker container on Azure VM
         uses: appleboy/ssh-action@v0.1.7
