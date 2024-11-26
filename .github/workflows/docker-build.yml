@@ -19,18 +19,18 @@ jobs:
           docker save interval-timer-app:latest > interval-timer-app.tar
 
       - name: Copy Docker image to Azure VM
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@0.1.7
         with:
           host: ${{ secrets.AZURE_VM_IP }}
           username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-          port: 22
+          port: ${{ secrets.PORT }}
           source: interval-timer-app.tar
           target: ~/interval-timer-app.tar
           debug: true
       
       - name: Deploy Docker container on Azure VM
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@1.1.0
         with:
           host: ${{ secrets.AZURE_VM_IP }}
           username: ${{ secrets.AZURE_VM_USER }}
