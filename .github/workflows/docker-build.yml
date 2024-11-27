@@ -27,7 +27,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t interval-timer-app:latest .
-          docker save interval-timer-app:latest > interval-timer-app.tar
+          docker save -o interval-timer-app.tar interval-timer-app:latest
 
       - name: List files
         run: ls -l
