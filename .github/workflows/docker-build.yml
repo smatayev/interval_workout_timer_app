@@ -62,11 +62,16 @@ jobs:
           systemctl status docker
           
           # Stop the existing container if it is running
-          echo "Stopping existing container..."
-          docker stop interval-timer || true
-          docker rm interval-timer || true
-          
-          # Debug output to see if Docker is healthy
+          echo "Checking if container exists..."
+          if [ $(docker ps -a -q -f name=interval-timer-app) ]; then
+            echo "Container interval-timer-app exists. Stopping and removing it..."
+            docker stop interval-timer-app
+            docker rm interval-timer-app
+          else
+            echo "No existing container named interval-timer-app found."
+          fi
+
+          # Debug output to verify container removal
           docker ps -a
 
           # Login to Docker Hub
