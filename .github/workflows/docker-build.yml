@@ -60,9 +60,10 @@ jobs:
           docker rm interval-timer-app || true
           # Check if port is available
           if sudo lsof -i :${{ secrets.PORT }}; then
-            echo "Port ${{ secrets.PORT }} is in use. Exiting."
-            exit 1
+            echo "Port ${{ secrets.PORT }} is in use. Attempting to free it..."
+            PID=$(sudo lsof -ti :${{ secrets.PORT }})
+            sudo kill -9 $PID || { echo "Failed to free port. Exiting."; exit 1; }
           fi
-          # Run the container
+
+          # Proceed with running the container
           docker run -d -p ${{ secrets.PORT }}:80 --name interval-timer-app ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
-      
