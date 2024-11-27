@@ -37,7 +37,7 @@ jobs:
           key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            docker load < ~/interval-timer-app.tar
+            docker load < /home/yourusername/interval-timer-app.tar
             docker stop interval-timer || true
             docker rm interval-timer || true
             docker run -d --name interval-timer -p 8080:80 interval-timer-app:latest
