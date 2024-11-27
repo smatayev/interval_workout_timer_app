@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16' # Specify the Node.js version you need
+          node-version: '16'
 
       - name: Install dependencies
         run: npm install
@@ -27,8 +27,13 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t interval-timer-app:latest .
-          # docker save interval-timer-app:latest > interval-timer-app.tar
-          docker save -o interval-timer-app.tar interval-timer-app:latest
+          docker save interval-timer-app:latest > interval-timer-app.tar
+
+      - name: List files
+        run: ls -l
+
+      - name: Set file permissions
+        run: chmod 644 interval-timer-app.tar
 
       - name: Copy Docker image to Azure VM
         uses: appleboy/scp-action@v0.1.7
@@ -39,7 +44,7 @@ jobs:
           port: ${{ secrets.PORT }}
           source: interval-timer-app.tar
           target: ~/interval-timer-app.tar
-          # debug: true
+          debug: true
       
       - name: Deploy Docker container on Azure VM
         uses: appleboy/ssh-action@v0.1.7
@@ -49,7 +54,7 @@ jobs:
           key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            sudo docker load < /home/azureuser/interval-timer-app.tar
+            sudo docker load --input /home/azureuser/interval-timer-app.tar
             sudo docker stop interval-timer || true
             sudo docker rm interval-timer || true
             sudo docker run -d --name interval-timer -p 8080:80 interval-timer-app:latest
