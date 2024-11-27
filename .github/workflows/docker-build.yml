@@ -46,15 +46,23 @@ jobs:
       working-directory: .  # Root of the repo
 
     - name: Deploy Docker image on Azure VM
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.AZURE_VM_IP }}
-        username: ${{ secrets.AZURE_VM_USER }}
-        key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-        port: ${{ secrets.PORT }}
-        script: |
-          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker pull ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
-          docker stop interval-timer-app || true
-          docker rm interval-timer-app || true
-          docker run -d -p ${{ secrets.PORT }}:80 --name interval-timer-app ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
+    uses: appleboy/ssh-action@v0.1.6
+    with:
+      host: ${{ secrets.AZURE_VM_IP }}
+      username: ${{ secrets.AZURE_VM_USER }}
+      key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+      port: 22
+      script: |
+        docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker pull ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
+        # Stop and remove existing container
+        docker stop interval-timer-app || true
+        docker rm interval-timer-app || true
+        # Check if port is available
+        if sudo lsof -i :${{ secrets.PORT }}; then
+          echo "Port ${{ secrets.PORT }} is in use. Exiting."
+          exit 1
+        fi
+        # Run the container
+        docker run -d -p ${{ secrets.PORT }}:80 --name interval-timer-app ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
+    
