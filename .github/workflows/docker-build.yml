@@ -54,8 +54,8 @@ jobs:
         port: ${{ secrets.PORT }}
         script: |
           # Stop the existing container if it is running
-          docker stop interval-timer-app || true
-          docker rm interval-timer-app || true
+          docker stop interval-timer || true
+          docker rm interval-timer || true
           
           # Login to Docker Hub
           docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
