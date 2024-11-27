@@ -51,11 +51,10 @@ jobs:
         host: ${{ secrets.AZURE_VM_IP }}
         username: ${{ secrets.AZURE_VM_USER }}
         key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-        port: 22
+        port: ${{ secrets.PORT }}
         script: |
           docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker pull ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
           docker stop interval-timer-app || true
           docker rm interval-timer-app || true
           docker run -d -p ${{ secrets.PORT }}:80 --name interval-timer-app ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
-      working-directory: .  # Root of the repo
