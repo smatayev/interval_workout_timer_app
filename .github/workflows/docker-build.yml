@@ -63,8 +63,8 @@ jobs:
           
           # Stop the existing container if it is running
           echo "Stopping existing container..."
-          docker stop interval-timer-app || true
-          docker rm interval-timer-app || true
+          docker stop interval-timer || true
+          docker rm interval-timer || true
           
           # Debug output to see if Docker is healthy
           docker ps -a
