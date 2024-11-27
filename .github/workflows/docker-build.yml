@@ -35,16 +35,9 @@ jobs:
       - name: Set file permissions
         run: chmod 644 interval-timer-app.tar
 
-      - name: Copy Docker image to Azure VM
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.AZURE_VM_IP }}
-          username: ${{ secrets.AZURE_VM_USER }}
-          key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-          port: ${{ secrets.PORT }}
-          source: "interval-timer-app.tar"
-          target: "~/interval-timer-app.tar"
-          debug: true
+      - name: Copy Docker image to Azure VM using rsync
+        run: |
+          rsync -avz -e "ssh -i ${{ secrets.AZURE_SSH_PRIVATE_KEY }}" interval-timer-app.tar ${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_IP }}:~/interval-timer-app.tar
       
       - name: Deploy Docker container on Azure VM
         uses: appleboy/ssh-action@v0.1.7
