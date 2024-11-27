@@ -19,37 +19,31 @@ jobs:
     #     pwd
     #     echo "Directory Contents:"
     #     ls -R
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-
-    - name: Cache Node.js modules
-      uses: actions/cache@v3
-      with:
-        path: ./interval-timer-app/node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+    #   working-directory: .  # Root of the repo
 
     - name: Install dependencies
       run: npm install
-      working-directory: .
+      working-directory: .  # Root of the repo
 
     # - name: Run tests
     #   run: npm test
-    #   working-directory: ./interval-timer-app
+    #   working-directory: .  # Root of the repo
 
     - name: Build the React app
       run: npm run build
-      working-directory: ./interval-timer-app
+      working-directory: .  # Root of the repo
 
-    - name: Build and push Docker image
+    - name: Build Docker image
+      run: |
+        docker build -t interval-timer-app:latest .
+      working-directory: .  # Root of the repo
+
+    - name: Push Docker image to Docker Hub
       run: |
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-        docker build -t ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }} ./interval-timer-app
+        docker tag interval-timer-app:latest ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
         docker push ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
+      working-directory: .  # Root of the repo
 
     - name: Deploy Docker image on Azure VM
       uses: appleboy/ssh-action@v0.1.6
@@ -57,10 +51,11 @@ jobs:
         host: ${{ secrets.AZURE_VM_IP }}
         username: ${{ secrets.AZURE_VM_USER }}
         key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-        port: ${{ secrets.PORT}}
+        port: 22
         script: |
           docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker pull ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
           docker stop interval-timer-app || true
           docker rm interval-timer-app || true
           docker run -d -p ${{ secrets.PORT }}:80 --name interval-timer-app ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
+      working-directory: .  # Root of the repo
