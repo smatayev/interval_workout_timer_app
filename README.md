@@ -21,7 +21,23 @@ The app also saves the last three interval settings for quick reuse.
 ## Technologies Used
 - React
 - Docker container
+- GitHub Actions
 - Azure VM
 - ESLint
 - Jest
-- GitHub Actions
+
+## Deployment Process
+
+### CI Pipeline:
+- All pull requests targeting the main branch trigger the CI pipeline defined in ci.yml.
+- The pipeline ensures code quality through linting (npm run lint) and runs tests (npm test).
+
+### Build and Deployment:
+When changes are merged into the main branch:
+- The docker-build.yml workflow is triggered.
+- A Docker image is built, tagged, and pushed to Docker Hub.
+- The application is deployed to the Azure VM using Docker Compose.
+
+### Docker Compose:
+- The deployment uses docker-compose.yml to manage the application service.
+- The configuration includes restart: always for resilience and dynamically sets the port from environment variables.

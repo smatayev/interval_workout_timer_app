@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  interval-timer-app:
+    image: ${DOCKER_REGISTRY}/interval-timer-app:${TAG}
+    ports:
+      - "${PORT}:80"
+    restart: always
+    

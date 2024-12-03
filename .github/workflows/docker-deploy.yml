@@ -1,0 +1,68 @@
+name: Build Docker image and Deploy the App to Azure VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: |
+        docker build -t interval-timer-app:latest .
+      working-directory: .  # Root of the repo
+
+    - name: Push Docker image to Docker Hub
+      run: |
+        docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker tag interval-timer-app:latest ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
+        docker push ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
+      working-directory: .  # Root of the repo
+
+    - name: Deploy using Docker Compose
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.AZURE_VM_IP }}
+        username: ${{ secrets.AZURE_VM_USER }}
+        key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+        port: 22
+        script: |
+          # Install Docker Compose if not installed
+          if ! [ -x "$(command -v docker-compose)" ]; then
+            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+
+          # Navigate to deployment directory
+          mkdir -p ~/interval-timer-app
+          cd ~/interval-timer-app
+
+          # Create or update docker-compose.yml
+          cat > docker-compose.yml <<EOL
+          version: '3.9'
+
+          services:
+            interval-timer-app:
+              image: ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
+              ports:
+                - "${{ secrets.PORT }}:80"
+              restart: always
+          EOL
+
+          # Log in to Docker Hub
+          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+          # Pull the latest image
+          docker-compose pull interval-timer-app
+
+          # Deploy the container using Docker Compose
+          docker-compose up -d interval-timer-app
+
+          # Verify the container is running
+          docker-compose ps
