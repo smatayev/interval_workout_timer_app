@@ -1,4 +1,4 @@
-name: Build Docker image and Deploy React App to Azure VM
+name: Build Docker image and Deploy the App to Azure VM
 
 on:
   push:
