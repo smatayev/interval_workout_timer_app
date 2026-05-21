@@ -4,6 +4,11 @@ services:
   interval-timer-app:
     image: ${DOCKER_REGISTRY}/interval-timer-app:${TAG}
     ports:
-      - "${PORT}:80"
+      - "${PORT:-80}:80"
     restart: always
-    
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

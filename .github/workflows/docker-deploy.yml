@@ -1,68 +1,101 @@
 name: Build Docker image and Deploy the App to Azure VM
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - Run tests and lint
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-push:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
 
-    - name: Build Docker image
-      run: |
-        docker build -t interval-timer-app:latest .
-      working-directory: .  # Root of the repo
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Push Docker image to Docker Hub
-      run: |
-        docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-        docker tag interval-timer-app:latest ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
-        docker push ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
-      working-directory: .  # Root of the repo
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
+            ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:latest
 
-    - name: Deploy using Docker Compose
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.AZURE_VM_IP }}
-        username: ${{ secrets.AZURE_VM_USER }}
-        key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-        port: 22
-        script: |
-          # Install Docker Compose if not installed
-          if ! [ -x "$(command -v docker-compose)" ]; then
-            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-          fi
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    runs-on: ubuntu-latest
+    needs: build-and-push
 
-          # Navigate to deployment directory
-          mkdir -p ~/interval-timer-app
-          cd ~/interval-timer-app
+    steps:
+      - name: Deploy to Azure VM
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+          TAG: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
+          PORT: ${{ secrets.PORT }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        with:
+          host: ${{ secrets.AZURE_VM_IP }}
+          username: ${{ secrets.AZURE_VM_USER }}
+          key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+          port: 22
+          envs: DOCKER_REGISTRY,TAG,PORT,DOCKER_USER,DOCKER_PASSWORD
+          script: |
+            set -e
 
-          # Create or update docker-compose.yml
-          cat > docker-compose.yml <<EOL
-          version: '3.9'
+            mkdir -p ~/interval-timer-app
+            cd ~/interval-timer-app
 
-          services:
-            interval-timer-app:
-              image: ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
-              ports:
-                - "${{ secrets.PORT }}:80"
-              restart: always
-          EOL
+            # Write docker-compose.yml with variable placeholders (single-quoted
+            # heredoc prevents shell expansion; docker compose resolves them from .env)
+            cat > docker-compose.yml <<'EOF'
+            version: '3.9'
+            services:
+              interval-timer-app:
+                image: ${DOCKER_REGISTRY}/interval-timer-app:${TAG}
+                ports:
+                  - "${PORT:-80}:80"
+                restart: always
+                healthcheck:
+                  test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+                  interval: 30s
+                  timeout: 10s
+                  retries: 3
+                  start_period: 10s
+            EOF
 
-          # Log in to Docker Hub
-          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+            # Write .env so docker compose resolves the variables above
+            cat > .env <<EOF
+            DOCKER_REGISTRY=${DOCKER_REGISTRY}
+            TAG=${TAG}
+            PORT=${PORT}
+            EOF
 
-          # Pull the latest image
-          docker-compose pull interval-timer-app
-
-          # Deploy the container using Docker Compose
-          docker-compose up -d interval-timer-app
-
-          # Verify the container is running
-          docker-compose ps
+            # Authenticate, pull, and restart
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+            docker compose pull
+            docker compose up -d
+            docker compose ps

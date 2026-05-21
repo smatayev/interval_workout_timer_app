@@ -1,5 +1,5 @@
-// src/components/Settings.js
 import React, { useState, useEffect } from 'react';
+import { configService } from '../services/configService';
 
 function Settings({
   intervalDuration,
@@ -11,28 +11,16 @@ function Settings({
 }) {
   const [savedConfigs, setSavedConfigs] = useState([]);
 
-  // Load saved configurations from local storage on mount
   useEffect(() => {
-    const configs = JSON.parse(localStorage.getItem('timerConfigs')) || [];
-    setSavedConfigs(configs);
+    setSavedConfigs(configService.getAll());
   }, []);
 
-  // Save a new configuration
-  const saveConfig = () => {
-    const newConfig = { intervalDuration, restDuration, totalIntervals };
-    let updatedConfigs = [newConfig, ...savedConfigs];
-
-    // Keep only the last three configurations
-    if (updatedConfigs.length > 3) {
-      updatedConfigs = updatedConfigs.slice(0, 3);
-    }
-
-    setSavedConfigs(updatedConfigs);
-    localStorage.setItem('timerConfigs', JSON.stringify(updatedConfigs));
+  const handleSave = () => {
+    const updated = configService.save({ intervalDuration, restDuration, totalIntervals });
+    setSavedConfigs(updated);
   };
 
-  // Load a saved configuration
-  const loadConfig = (config) => {
+  const handleLoad = (config) => {
     setIntervalDuration(config.intervalDuration);
     setRestDuration(config.restDuration);
     setTotalIntervals(config.totalIntervals);
@@ -102,12 +90,12 @@ function Settings({
         />
       </div>
       <div className="settings-actions">
-        <button onClick={saveConfig} className="settings-button">Save Configuration</button>
+        <button onClick={handleSave} className="settings-button">Save Configuration</button>
         <div className="saved-configs">
           {savedConfigs.map((config, index) => (
             <button
               key={index}
-              onClick={() => loadConfig(config)}
+              onClick={() => handleLoad(config)}
               className="saved-config-button"
             >
               Config {index + 1}: {config.intervalDuration.minutes}m {config.intervalDuration.seconds}s / {config.restDuration.minutes}m {config.restDuration.seconds}s / {config.totalIntervals} intervals
