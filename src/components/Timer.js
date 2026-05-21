@@ -1,6 +1,5 @@
-// src/components/Timer.js
 import React from 'react';
-import { formatTime } from '../utils/timeUtils';
+import { formatTime } from '../utils/timerEngine';
 
 function Timer({ timeLeft, isResting, currentInterval, totalIntervals }) {
   return (
