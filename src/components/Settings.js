@@ -26,84 +26,97 @@ function Settings({
     setTotalIntervals(config.totalIntervals);
   };
 
-  return (
-    <div className="settings-container">
-      <h3>Settings</h3>
-      <div className="settings-group">
-        <label>Interval Duration: </label>
+  const renderDurationFields = (id, value, setter) => (
+    <div className="settings-fields">
+      <div className="settings-field">
         <input
+          id={`${id}-min`}
           type="number"
-          name="minutes"
-          value={intervalDuration.minutes}
-          onChange={(e) =>
-            setIntervalDuration((prev) => ({ ...prev, minutes: parseInt(e.target.value, 10) || 0 }))
-          }
           min="0"
-          className="settings-input"
-        />{' '}
-        min
-        <input
-          type="number"
-          name="seconds"
-          value={intervalDuration.seconds}
+          value={value.minutes}
           onChange={(e) =>
-            setIntervalDuration((prev) => ({ ...prev, seconds: parseInt(e.target.value, 10) || 0 }))
+            setter((prev) => ({ ...prev, minutes: parseInt(e.target.value, 10) || 0 }))
           }
-          min="0"
           className="settings-input"
-        />{' '}
-        sec
-      </div>
-      <div className="settings-group">
-        <label>Rest Duration: </label>
-        <input
-          type="number"
-          name="minutes"
-          value={restDuration.minutes}
-          onChange={(e) =>
-            setRestDuration((prev) => ({ ...prev, minutes: parseInt(e.target.value, 10) || 0 }))
-          }
-          min="0"
-          className="settings-input"
-        />{' '}
-        min
-        <input
-          type="number"
-          name="seconds"
-          value={restDuration.seconds}
-          onChange={(e) =>
-            setRestDuration((prev) => ({ ...prev, seconds: parseInt(e.target.value, 10) || 0 }))
-          }
-          min="0"
-          className="settings-input"
-        />{' '}
-        sec
-      </div>
-      <div className="settings-group">
-        <label>Total Intervals: </label>
-        <input
-          type="number"
-          value={totalIntervals}
-          onChange={(e) => setTotalIntervals(parseInt(e.target.value, 10) || 0)}
-          min="1"
-          className="settings-input"
+          aria-label={`${id} minutes`}
         />
+        <span className="settings-unit">min</span>
       </div>
-      <div className="settings-actions">
-        <button onClick={handleSave} className="settings-button">Save Configuration</button>
-        <div className="saved-configs">
-          {savedConfigs.map((config, index) => (
-            <button
-              key={index}
-              onClick={() => handleLoad(config)}
-              className="saved-config-button"
-            >
-              Config {index + 1}: {config.intervalDuration.minutes}m {config.intervalDuration.seconds}s / {config.restDuration.minutes}m {config.restDuration.seconds}s / {config.totalIntervals} intervals
-            </button>
-          ))}
-        </div>
+      <div className="settings-field">
+        <input
+          id={`${id}-sec`}
+          type="number"
+          min="0"
+          value={value.seconds}
+          onChange={(e) =>
+            setter((prev) => ({ ...prev, seconds: parseInt(e.target.value, 10) || 0 }))
+          }
+          className="settings-input"
+          aria-label={`${id} seconds`}
+        />
+        <span className="settings-unit">sec</span>
       </div>
     </div>
+  );
+
+  return (
+    <section className="card">
+      <h3>Settings</h3>
+
+      <div className="settings-group">
+        <label htmlFor="interval-min">Interval duration</label>
+        {renderDurationFields('interval', intervalDuration, setIntervalDuration)}
+      </div>
+
+      <div className="settings-group">
+        <label htmlFor="rest-min">Rest duration</label>
+        {renderDurationFields('rest', restDuration, setRestDuration)}
+      </div>
+
+      <div className="settings-group">
+        <label htmlFor="total-intervals">Total intervals</label>
+        <div className="settings-fields settings-fields--single">
+          <div className="settings-field">
+            <input
+              id="total-intervals"
+              type="number"
+              min="1"
+              value={totalIntervals}
+              onChange={(e) => setTotalIntervals(parseInt(e.target.value, 10) || 0)}
+              className="settings-input"
+              aria-label="Total intervals"
+            />
+            <span className="settings-unit">rounds</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="settings-actions">
+        <button
+          type="button"
+          onClick={handleSave}
+          className="btn btn--secondary btn--block"
+        >
+          Save configuration
+        </button>
+        {savedConfigs.length > 0 && (
+          <div className="saved-configs">
+            {savedConfigs.map((config, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => handleLoad(config)}
+                className="saved-config-chip"
+              >
+                {config.intervalDuration.minutes}m {config.intervalDuration.seconds}s ·{' '}
+                {config.restDuration.minutes}m {config.restDuration.seconds}s ·{' '}
+                {config.totalIntervals}×
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

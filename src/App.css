@@ -1,174 +1,354 @@
+/* ---------- App shell ---------- */
 .app-container {
-  text-align: center;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
-.settings-container,
-.timer-container,
-.controls-container {
-  text-align: left;
-}
-
-label {
-  margin-right: 10px;
-}
-
-input {
-  margin: 5px;
-  padding: 5px;
-  width: 50px;
-  text-align: center;
-}
-
-.control-button {
-  padding: 10px 20px;
-  margin: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 8px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  transition: background-color 0.3s;
-}
-
-.control-button:hover {
-  background-color: #0056b3;
-}
-
-.stop-button {
-  background-color: #dc3545;
-}
-
-.stop-button:hover {
-  background-color: #c82333;
-}
-
-
-.timer-container.resting {
-  border-color: #17a2b8;
-}
-
-/* Countdown overlay */
-.countdown-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 48px;
-  z-index: 10;
-}
-
-.settings-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: clamp(12px, 4vw, 24px);
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  max-width: 400px;
-  margin: 0 auto;
+  gap: var(--space-5);
+  text-align: center;
+  animation: fade-in var(--dur-base) var(--ease);
 }
 
+.app-title {
+  margin: var(--space-2) 0 var(--space-1);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: clamp(14px, 4vw, 22px);
+  text-align: left;
+  animation: fade-in var(--dur-base) var(--ease);
+}
+
+.card h3 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ---------- Settings ---------- */
 .settings-group {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.settings-group:last-of-type {
+  margin-bottom: var(--space-2);
 }
 
 .settings-group label {
-  flex: 1;
-  text-align: left;
-  font-weight: bold;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-muted);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.settings-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.settings-fields--single {
+  grid-template-columns: 1fr;
+}
+
+.settings-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  transition: border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease);
+}
+
+.settings-field:focus-within {
+  border-color: var(--color-accent);
+  background-color: var(--color-surface);
 }
 
 .settings-input {
-  width: 50px;
-  padding: 5px;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: right;
+  -moz-appearance: textfield;
+}
+
+.settings-input::-webkit-outer-spin-button,
+.settings-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.settings-unit {
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
 }
 
 .settings-actions {
-  margin-top: 20px;
-}
-
-.settings-button {
-  padding: 8px 12px;
-  margin-right: 10px;
-  font-size: 14px;
-  cursor: pointer;
-  border: 1px solid #007bff;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  transition: background-color 0.3s;
-}
-
-.settings-button:hover {
-  background-color: #0056b3;
+  margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .saved-configs {
-  margin-top: 10px;
-}
-
-.saved-config-button {
-  display: block;
-  margin-top: 5px;
-  padding: 8px 12px;
-  font-size: 12px;
-  cursor: pointer;
-  border: 1px solid #6c757d;
-  border-radius: 4px;
-  background-color: #f8f9fa;
-  color: #343a40;
-  transition: background-color 0.3s;
-}
-
-.saved-config-button:hover {
-  background-color: #e2e6ea;
-}
-
-
-.settings-container,
-.timer-container,
-.controls-container {
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  padding: 15px;
-  margin: 20px auto;
-  max-width: 400px;
-  background-color: #f9f9f9; /* Light background for better visibility */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for a subtle 3D effect */
-}
-
-.settings-container h3 {
-  margin-top: 0;
-}
-
-.controls-container {
-  text-align: center;
-}
-
-.timer-container {
   display: flex;
-  justify-content: space-between; /* Space between timer and progress bar */
-  align-items: center;
-  padding: 15px;
-  margin: 10px auto;
-  max-width: 400px;
-  border: 2px solid #ccc;
-  background-color: #f9f9f9;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
-.timer-container > * {
-  flex: 1;
-  padding: 10px;
+.saved-config-chip {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-alt);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.saved-config-chip:hover {
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.saved-config-chip:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background-color: var(--color-accent);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn--primary:hover {
+  background-color: var(--color-accent-strong);
+}
+
+.btn--secondary {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.btn--secondary:hover {
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.btn--danger {
+  background-color: transparent;
+  color: var(--color-stop-strong);
+  border-color: var(--color-stop);
+}
+
+.btn--danger:hover {
+  background-color: var(--color-stop);
+  color: #fff;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* ---------- Timer ---------- */
+.timer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: clamp(18px, 5vw, 28px);
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-alt) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: border-color var(--dur-base) var(--ease),
+    box-shadow var(--dur-base) var(--ease);
+}
+
+.timer-card.is-resting {
+  border-color: var(--color-rest);
+  box-shadow: 0 4px 16px rgba(168, 198, 199, 0.35);
+}
+
+.timer-card.is-active {
+  border-color: var(--color-accent);
+  animation: pulse 2.4s var(--ease) infinite;
+}
+
+.timer-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.timer-phase {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.timer-card.is-resting .timer-phase {
+  color: var(--color-rest);
+}
+
+.timer-card.is-active .timer-phase {
+  color: var(--color-accent-strong);
+}
+
+.timer-display {
+  font-size: var(--font-size-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+  line-height: 1;
+}
+
+.timer-progress {
+  width: clamp(120px, 30vw, 160px);
+  height: clamp(120px, 30vw, 160px);
+  margin-top: var(--space-2);
+}
+
+/* ---------- Controls ---------- */
+.controls-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ---------- Countdown overlay ---------- */
+.countdown-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  animation: fade-in var(--dur-base) var(--ease);
+  padding: var(--space-6);
+}
+
+.countdown-text {
+  margin: 0;
+  font-size: clamp(2.2rem, 9vw, 3.6rem);
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Animations ---------- */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 4px 12px rgba(126, 168, 141, 0.18);
+  }
+  50% {
+    box-shadow: 0 4px 22px rgba(126, 168, 141, 0.38);
+  }
+}
+
+/* ---------- Tablet+ breakpoint ---------- */
+@media (min-width: 640px) {
+  .app-container {
+    max-width: 560px;
+    gap: var(--space-6);
+  }
+
+  .timer-card {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+  }
+
+  .timer-stack {
+    align-items: flex-start;
+  }
+
+  .controls-row {
+    flex-direction: row;
+  }
+
+  .controls-row .btn {
+    flex: 1;
+  }
 }
