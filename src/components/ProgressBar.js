@@ -7,17 +7,17 @@ function ProgressBar({ totalIntervals, currentInterval, isResting }) {
   const percentage = calculateProgress({ currentInterval, totalIntervals });
 
   return (
-    <div style={{ width: 100, height: 100, margin: 'auto' }}>
-      <CircularProgressbar
-        value={percentage}
-        text={`${Math.round(percentage)}%`}
-        styles={buildStyles({
-          pathColor: isResting ? 'azure' : 'cerulean',
-          trailColor: 'navy',
-          textSize: '15px',
-        })}
-      />
-    </div>
+    <CircularProgressbar
+      value={percentage}
+      text={`${Math.round(percentage)}%`}
+      styles={buildStyles({
+        pathColor: isResting ? '#a8c6c7' : '#7ea88d',
+        trailColor: '#f2e9dc',
+        textColor: '#3f3428',
+        textSize: '20px',
+        pathTransitionDuration: 0.4,
+      })}
+    />
   );
 }
 
