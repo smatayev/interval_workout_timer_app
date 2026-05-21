@@ -43,11 +43,28 @@ npm run lint     # ESLint (with jsx-a11y and react-hooks plugins)
 
 ## Deployment
 
-### CI (pull requests → `main`)
-- Runs `npm run lint` and `npm test` on every PR targeting `main` (`ci.yml`).
+### CI
+- Runs `npm run lint` and `npm test` for:
+	- every PR targeting `main`
+	- every push to `main`
+- Workflow file: `.github/workflows/ci.yml`.
 
-### Build & Deploy (merge to `main`)
-- `docker-build.yml` builds a production image, tags it, and pushes to Docker Hub.
+### Build & Deploy
+- `.github/workflows/docker-deploy.yml` runs deployment after the CI workflow completes successfully on `main`.
+- The workflow can also be triggered manually with `workflow_dispatch`.
+- Docker image builds are cached in GitHub Actions for faster rebuilds.
 - The Azure VM pulls the new image and redeploys via `docker-compose.yml`.
 - `docker-compose.yml` sets `restart: always` for resilience and reads `PORT` from an environment variable (defaults to `80`).
 - A `healthcheck` polls `http://localhost/` every 30 seconds to confirm the container is healthy.
+
+## Branching Strategy
+
+- `main` is the only production branch.
+- Use short-lived branches: `feature/*`, `fix/*`, `hotfix/*`.
+- Merge to `main` through pull requests only.
+- Recommended GitHub branch protection on `main`:
+	- require pull request before merge
+	- require the CI workflow status checks to pass
+	- require branch to be up to date before merge
+	- require at least one approval
+	- restrict direct pushes

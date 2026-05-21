@@ -1,17 +1,30 @@
 name: Build Docker image and Deploy the App to Azure VM
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - Run tests and lint
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
 
 jobs:
   build-and-push:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -24,11 +37,14 @@ jobs:
         with:
           context: .
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
-            ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.sha }}
+            ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
             ${{ secrets.DOCKER_REGISTRY }}/interval-timer-app:latest
 
   deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     needs: build-and-push
 
@@ -37,7 +53,7 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         env:
           DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
-          TAG: ${{ github.sha }}
+          TAG: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
           PORT: ${{ secrets.PORT }}
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
