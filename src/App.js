@@ -39,6 +39,12 @@ function App() {
             currentInterval={currentInterval}
             totalIntervals={totalIntervals}
           />
+          <Controls
+            isRunning={isRunning}
+            isPaused={isPaused}
+            onStartPause={isRunning ? togglePause : start}
+            onStop={stop}
+          />
           <Settings
             intervalDuration={intervalDuration}
             setIntervalDuration={setIntervalDuration}
@@ -46,12 +52,6 @@ function App() {
             setRestDuration={setRestDuration}
             totalIntervals={totalIntervals}
             setTotalIntervals={setTotalIntervals}
-          />
-          <Controls
-            isRunning={isRunning}
-            isPaused={isPaused}
-            onStartPause={isRunning ? togglePause : start}
-            onStop={stop}
           />
         </>
       )}
