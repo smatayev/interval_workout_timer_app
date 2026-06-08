@@ -32,6 +32,13 @@ function App() {
         </div>
       ) : (
         <>
+          <Timer
+            timeLeft={timeLeft}
+            isResting={isResting}
+            isRunning={isRunning}
+            currentInterval={currentInterval}
+            totalIntervals={totalIntervals}
+          />
           <Settings
             intervalDuration={intervalDuration}
             setIntervalDuration={setIntervalDuration}
@@ -39,13 +46,6 @@ function App() {
             setRestDuration={setRestDuration}
             totalIntervals={totalIntervals}
             setTotalIntervals={setTotalIntervals}
-          />
-          <Timer
-            timeLeft={timeLeft}
-            isResting={isResting}
-            isRunning={isRunning}
-            currentInterval={currentInterval}
-            totalIntervals={totalIntervals}
           />
           <Controls
             isRunning={isRunning}
