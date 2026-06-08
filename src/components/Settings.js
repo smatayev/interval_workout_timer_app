@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { configService } from '../services/configService';
+import SpinnerInput from './SpinnerInput';
 
 function Settings({
   intervalDuration,
@@ -26,68 +27,70 @@ function Settings({
     setTotalIntervals(config.totalIntervals);
   };
 
-  const renderDurationFields = (id, value, setter) => (
-    <div className="settings-fields">
-      <div className="settings-field">
-        <input
-          id={`${id}-min`}
-          type="number"
-          min="0"
-          value={value.minutes}
-          onChange={(e) =>
-            setter((prev) => ({ ...prev, minutes: parseInt(e.target.value, 10) || 0 }))
-          }
-          className="settings-input"
-          aria-label={`${id} minutes`}
-        />
-        <span className="settings-unit">min</span>
-      </div>
-      <div className="settings-field">
-        <input
-          id={`${id}-sec`}
-          type="number"
-          min="0"
-          value={value.seconds}
-          onChange={(e) =>
-            setter((prev) => ({ ...prev, seconds: parseInt(e.target.value, 10) || 0 }))
-          }
-          className="settings-input"
-          aria-label={`${id} seconds`}
-        />
-        <span className="settings-unit">sec</span>
-      </div>
-    </div>
-  );
-
   return (
     <section className="card">
       <h3>Settings</h3>
 
       <div className="settings-group">
-        <label htmlFor="interval-min">Interval duration</label>
-        {renderDurationFields('interval', intervalDuration, setIntervalDuration)}
+        <span className="settings-group-label">Interval Time</span>
+        <div className="spinner-row">
+          <SpinnerInput
+            id="interval-min"
+            value={intervalDuration.minutes}
+            onChange={(v) => setIntervalDuration((prev) => ({ ...prev, minutes: v }))}
+            min={0}
+            max={30}
+            step={1}
+            label="min"
+          />
+          <SpinnerInput
+            id="interval-sec"
+            value={intervalDuration.seconds}
+            onChange={(v) => setIntervalDuration((prev) => ({ ...prev, seconds: v }))}
+            min={0}
+            max={55}
+            step={5}
+            label="sec"
+          />
+        </div>
       </div>
 
       <div className="settings-group">
-        <label htmlFor="rest-min">Rest duration</label>
-        {renderDurationFields('rest', restDuration, setRestDuration)}
+        <span className="settings-group-label">Rest Time</span>
+        <div className="spinner-row">
+          <SpinnerInput
+            id="rest-min"
+            value={restDuration.minutes}
+            onChange={(v) => setRestDuration((prev) => ({ ...prev, minutes: v }))}
+            min={0}
+            max={10}
+            step={1}
+            label="min"
+          />
+          <SpinnerInput
+            id="rest-sec"
+            value={restDuration.seconds}
+            onChange={(v) => setRestDuration((prev) => ({ ...prev, seconds: v }))}
+            min={0}
+            max={55}
+            step={5}
+            label="sec"
+          />
+        </div>
       </div>
 
       <div className="settings-group">
-        <label htmlFor="total-intervals">Total intervals</label>
-        <div className="settings-fields settings-fields--single">
-          <div className="settings-field">
-            <input
-              id="total-intervals"
-              type="number"
-              min="1"
-              value={totalIntervals}
-              onChange={(e) => setTotalIntervals(parseInt(e.target.value, 10) || 0)}
-              className="settings-input"
-              aria-label="Total intervals"
-            />
-            <span className="settings-unit">rounds</span>
-          </div>
+        <span className="settings-group-label">Total Intervals</span>
+        <div className="spinner-row spinner-row--single">
+          <SpinnerInput
+            id="total-intervals"
+            value={totalIntervals}
+            onChange={(v) => setTotalIntervals(v)}
+            min={1}
+            max={10}
+            step={1}
+            label="rounds"
+          />
         </div>
       </div>
 
