@@ -81,28 +81,30 @@ function Settings({
 
       <div className="settings-group">
         <span className="settings-group-label">Total Intervals</span>
-        <div className="spinner-row spinner-row--single">
-          <SpinnerInput
-            id="total-intervals"
-            value={totalIntervals}
-            onChange={(v) => setTotalIntervals(v)}
-            min={1}
-            max={10}
-            step={1}
-            label="rounds"
-          />
+        <div className="settings-inline-row">
+          <div className="spinner-row spinner-row--single">
+            <SpinnerInput
+              id="total-intervals"
+              value={totalIntervals}
+              onChange={(v) => setTotalIntervals(v)}
+              min={1}
+              max={10}
+              step={1}
+              label="rounds"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="btn btn--secondary settings-save-btn"
+          >
+            Save configuration
+          </button>
         </div>
       </div>
 
-      <div className="settings-actions">
-        <button
-          type="button"
-          onClick={handleSave}
-          className="btn btn--secondary btn--block"
-        >
-          Save configuration
-        </button>
-        {savedConfigs.length > 0 && (
+      {savedConfigs.length > 0 && (
+        <div className="settings-actions">
           <div className="saved-configs">
             {savedConfigs.map((config, index) => (
               <button
@@ -117,8 +119,8 @@ function Settings({
               </button>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </section>
   );
 }

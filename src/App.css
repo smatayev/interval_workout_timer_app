@@ -188,6 +188,18 @@
   justify-content: flex-start;
 }
 
+.settings-inline-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.settings-inline-row .spinner-row {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
 .spinner-item {
   display: flex;
   flex-direction: column;
@@ -320,6 +332,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+.settings-save-btn {
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+  padding-inline: clamp(10px, 2vw, 16px);
+  align-self: flex-start;
 }
 
 .saved-configs {
@@ -476,6 +498,24 @@
 
   .settings-field {
     padding: var(--space-1) clamp(6px, 1.5vw, 8px);
+  }
+
+  .settings-inline-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-inline-row .spinner-row {
+    width: 100%;
+  }
+
+  .settings-inline-row .spinner-row--single .spinner-item {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .settings-save-btn {
+    width: 100%;
   }
 }
 
