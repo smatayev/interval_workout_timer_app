@@ -2,6 +2,9 @@
 
 A React-based interval workout timer that lets users configure work/rest cycles and tracks progress through each session. Settings persist across visits so previously used configurations are always one click away.
 
+![Interval Timer App Screenshot](screenshot.png)
+
+
 ## Features
 
 - **Configurable intervals** — set active interval duration, rest duration, and total interval count (in minutes and seconds)
